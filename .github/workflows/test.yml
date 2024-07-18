@@ -20,14 +20,14 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
         python -m venv venv
         source venv/bin/activate
         pip install --upgrade pip
-        pip install --upgrade -r requirements.txt
+        pip install -r requirements.txt
         pip install jupyter nbconvert
 
     - name: Find and run notebooks
@@ -36,12 +36,13 @@ jobs:
         FAILED_NOTEBOOKS=()
         for notebook in $(find . -name "*.ipynb"); do
           echo "Running $notebook"
-          if ! jupyter nbconvert --to notebook --execute "$notebook" --output "$notebook"; then
-            FAILED_NOTEBOOKS+=("$notebook")
+          output_notebook="${notebook%.ipynb}_output.ipynb"
+          if ! jupyter nbconvert --to notebook --execute "$notebook" --output "$output_notebook"; then
+            FAILED_NOTEBOOKS+=("$output_notebook")
           fi
         done
         if [ ${#FAILED_NOTEBOOKS[@]} -ne 0 ]; then
-          echo "The following notebooks failed to execute:"
+          echo "The following notebooks failed to execute and their outputs have been saved:"
           for nb in "${FAILED_NOTEBOOKS[@]}"; do
             echo "$nb"
           done
