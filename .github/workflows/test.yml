@@ -22,13 +22,24 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Cache h5ad files
+      uses: actions/cache@v3
+      with:
+        path: h5ad_cache
+        key: ${{ runner.os }}-h5ad-${{ hashFiles('**/*.ipynb') }}
+        restore-keys: |
+          ${{ runner.os }}-h5ad-
+
     - name: Install dependencies
       run: |
         python -m venv venv
         source venv/bin/activate
         pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --upgrade -r requirements.txt
         pip install jupyter nbconvert
+
+    - name: Create h5ad cache directory
+      run: mkdir -p h5ad_cache
 
     - name: Find and run notebooks
       run: |
@@ -48,3 +59,8 @@ jobs:
           done
           exit 1
         fi
+
+    - name: Save h5ad files to cache
+      if: success()
+      run: |
+        mv *.h5ad h5ad_cache/
