@@ -1,0 +1,6 @@
+vfb-connect
+jupyter
+ipython
+anndata
+pandas
+cellxgene
