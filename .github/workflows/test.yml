@@ -33,6 +33,17 @@ jobs:
     - name: Find and run notebooks
       run: |
         source venv/bin/activate
+        FAILED_NOTEBOOKS=()
         for notebook in $(find . -name "*.ipynb"); do
-          jupyter nbconvert --to notebook --execute "$notebook" --output "$notebook"
+          echo "Running $notebook"
+          if ! jupyter nbconvert --to notebook --execute "$notebook" --output "$notebook"; then
+            FAILED_NOTEBOOKS+=("$notebook")
+          fi
         done
+        if [ ${#FAILED_NOTEBOOKS[@]} -ne 0 ]; then
+          echo "The following notebooks failed to execute:"
+          for nb in "${FAILED_NOTEBOOKS[@]}"; do
+            echo "$nb"
+          done
+          exit 1
+        fi
