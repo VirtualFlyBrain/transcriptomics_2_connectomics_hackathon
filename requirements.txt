@@ -4,4 +4,3 @@ ipython
 anndata
 pandas
 cellxgene
-pytest
