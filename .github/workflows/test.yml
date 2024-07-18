@@ -1,4 +1,4 @@
-name: Test Workflow
+name: Notebook Test Workflow
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: 
       - '**'
-      
+
 jobs:
   build:
 
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
@@ -28,8 +28,11 @@ jobs:
         source venv/bin/activate
         pip install --upgrade pip
         pip install -r requirements.txt
+        pip install jupyter nbconvert
 
-    - name: Run tests
+    - name: Find and run notebooks
       run: |
         source venv/bin/activate
-        pytest
+        for notebook in $(find . -name "*.ipynb"); do
+          jupyter nbconvert --to notebook --execute "$notebook" --output "$notebook"
+        done
